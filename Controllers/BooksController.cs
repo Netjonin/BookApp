@@ -11,25 +11,52 @@ using Microsoft.Extensions.Logging;
 namespace bookapp.Controllers
 {
     [Route("api/[controller]")]
-    public class BooksController : Controller
+    public class BooksController : ControllerBase
     {
-        private readonly IBookService _service;
-
+        private IBookService _service;
         public BooksController(IBookService service)
         {
             _service = service;
         }
+
+        //Create/Add a new book
         [HttpPost("AddBook")]
-        public IActionResult AddBook([FromBody]Book book)
+        public IActionResult AddBook([FromBody] Book book)
         {
             _service.AddBook(book);
             return Ok("Added");
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        //Read all books
+        [HttpGet("[action]")]
+        public IActionResult GetBooks()
         {
-            return View("Error!");
+            var allBooks = _service.GetAllBooks();
+            return Ok(allBooks);
+        }
+
+        //Update an existing book
+        [HttpPut("UpdateBook/{id}")]
+        public IActionResult UpdateBook(int id, [FromBody] Book book)
+        {
+            _service.UpdateBook(id, book);
+            return Ok(book);
+        }
+
+        //Delete a book
+        [HttpDelete("DeleteBook/{id}")]
+        public IActionResult DeleteBook(int id)
+        {
+            _service.DeleteBook(id);
+            return Ok();
+        }
+
+        //Get a single book by id
+        [HttpGet("SingleBook/{id}")]
+        public IActionResult GetBookById(int id)
+        {
+            var book = _service.GetBookById(id);
+            return Ok(book);
         }
     }
 }
